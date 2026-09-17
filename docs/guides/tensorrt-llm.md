@@ -58,7 +58,10 @@ deliberately: the `1.2.1` GA image fails at `import tensorrt` because
 Move to the first 1.3.x GA once it is published.
 `TLLM_NCCL_SYMMETRIC_ZERO_COPY=0` disables NCCL registered windows that CUDA
 checkpoint does not support. `UCX_TLS=tcp,self` avoids RDMA mappings that CRIU
-cannot restore.
+cannot restore. MPI request broadcasts use `OMPI_MCA_pml=ob1` and
+`OMPI_MCA_btl=tcp,self` rather than UCX: restricting UCX to TCP alone does not
+prevent its endpoints from timing out after cross-node restore. These settings
+change MPI's CPU communication, not TensorRT-LLM's CUDA collective strategy.
 
 The source and restore pods must use the same immutable image and mount the
 Snapshot control volume at `/snapshot-control`.
